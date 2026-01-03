@@ -4,6 +4,11 @@ import { storage } from './storage';
 // Use environment variable or detect localhost for development
 const getApiUrl = () => {
   // Priority: NEXT_PUBLIC_API_URL (for production/GitHub Pages)
+  // This is set at build time via GitHub Secrets
+  if (typeof window !== 'undefined' && (window as any).__NEXT_PUBLIC_API_URL__) {
+    return (window as any).__NEXT_PUBLIC_API_URL__;
+  }
+  
   if (process.env.NEXT_PUBLIC_API_URL) {
     return process.env.NEXT_PUBLIC_API_URL;
   }
@@ -16,7 +21,8 @@ const getApiUrl = () => {
     }
   }
   
-  // Fallback
+  // Fallback - but this won't work on GitHub Pages
+  console.warn('NEXT_PUBLIC_API_URL not set, using localhost fallback (may not work on GitHub Pages)');
   return 'http://localhost:5001/api';
 };
 
