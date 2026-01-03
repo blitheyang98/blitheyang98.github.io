@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { storage } from '../utils/storage';
 
 export default function Home() {
@@ -22,13 +23,22 @@ export default function Home() {
     const userStr = storage.getItem('user');
     
     if (!token) {
+      // Check if we're on the root path (considering basePath)
+      // On GitHub Pages: /Recruitment_Evaluation_System/ or /Recruitment_Evaluation_System
+      // On localhost: /
+      const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+      const isRootPath = currentPath === '/' || 
+                        currentPath === '/Recruitment_Evaluation_System/' || 
+                        currentPath === '/Recruitment_Evaluation_System';
+      
       // Allow access to register page on user portal
-      if (!isStaff && typeof window !== 'undefined' && window.location.pathname === '/register') {
+      if (!isStaff && typeof window !== 'undefined' && 
+          (currentPath === '/register' || currentPath === '/Recruitment_Evaluation_System/register' || currentPath === '/Recruitment_Evaluation_System/register/')) {
         return; // Don't redirect, allow registration
       }
       // If user is on root path and not logged in, show portal selection page
       // Don't redirect immediately, let them choose
-      if (typeof window !== 'undefined' && window.location.pathname === '/') {
+      if (isRootPath) {
         return; // Show portal selection page
       }
       // For other paths, redirect to appropriate login page based on portal
@@ -89,7 +99,7 @@ export default function Home() {
     }}>
       <h1 style={{ marginBottom: '30px' }}>Recruitment Evaluation System</h1>
       <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
-        <a
+        <Link
           href="/login"
           style={{
             display: 'inline-block',
@@ -106,8 +116,8 @@ export default function Home() {
           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#007bff'}
         >
           User Portal
-        </a>
-        <a
+        </Link>
+        <Link
           href="/login?portal=staff"
           style={{
             display: 'inline-block',
@@ -124,7 +134,7 @@ export default function Home() {
           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#28a745'}
         >
           Staff Portal
-        </a>
+        </Link>
       </div>
     </div>
   );
