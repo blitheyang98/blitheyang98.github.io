@@ -1,0 +1,20 @@
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  output: 'export',
+  trailingSlash: true,
+  images: {
+    unoptimized: true,
+  },
+  // basePath: 如果仓库名不是 username.github.io，需要设置 basePath
+  // 例如：如果仓库名是 "my-project"，设置为 basePath: '/my-project'
+  // 如果仓库名是 "username.github.io"，则不需要设置（或设为空字符串）
+  // basePath: process.env.NEXT_PUBLIC_BASE_PATH || '',
+  env: {
+    API_URL: process.env.API_URL || 'http://localhost:5001/api',
+    NEXT_PUBLIC_GOOGLE_FORM_URL: process.env.NEXT_PUBLIC_GOOGLE_FORM_URL,
+  },
+}
+
+module.exports = nextConfig
+
