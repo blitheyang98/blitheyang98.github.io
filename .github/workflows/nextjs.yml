@@ -50,12 +50,15 @@ jobs:
       - name: Install dependencies
         working-directory: ./Recruitment_Evaluation_System/client
         run: npm install
+      - name: Install SWC for Linux
+        working-directory: ./Recruitment_Evaluation_System/client
+        run: |
+          npm install @next/swc-linux-x64-gnu@14.2.35 --save-optional --force || npm install @next/swc-linux-x64-gnu --save-optional --force
       - name: Build with Next.js
         working-directory: ./Recruitment_Evaluation_System/client
         env:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
           NEXT_PUBLIC_GOOGLE_FORM_URL: ${{ secrets.NEXT_PUBLIC_GOOGLE_FORM_URL }}
-          NEXT_DISABLE_SWC: 1
         run: npm run build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
