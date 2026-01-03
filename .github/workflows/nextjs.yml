@@ -63,10 +63,17 @@ jobs:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
           NEXT_PUBLIC_GOOGLE_FORM_URL: ${{ secrets.NEXT_PUBLIC_GOOGLE_FORM_URL }}
         run: npm run build
+      - name: Prepare deployment
+        working-directory: ./Recruitment_Evaluation_System/client
+        run: |
+          # Create the basePath directory structure
+          mkdir -p deploy/Recruitment_Evaluation_System
+          # Copy all files from out/ to deploy/Recruitment_Evaluation_System/
+          cp -r out/* deploy/Recruitment_Evaluation_System/
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./Recruitment_Evaluation_System/client/out/Recruitment_Evaluation_System
+          path: ./Recruitment_Evaluation_System/client/deploy
 
   # Deployment job
   deploy:
