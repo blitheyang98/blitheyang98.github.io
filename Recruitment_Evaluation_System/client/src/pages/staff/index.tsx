@@ -27,14 +27,14 @@ ChartJS.register(
 export default function StaffDashboard() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('virtual-runs');
-  const [virtualRuns, setVirtualRuns] = useState([]);
+  const [virtualRuns, setVirtualRuns] = useState<any[]>([]);
   const [formSubmissions, setFormSubmissions] = useState<any[]>([]);
   const [allFormSubmissions, setAllFormSubmissions] = useState<any[]>([]);
   const [activeFormTab, setActiveFormTab] = useState<string | null>(null);
   const [previewFormUrl, setPreviewFormUrl] = useState<string | null>(null);
-  const [quizAttempts, setQuizAttempts] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [quizzes, setQuizzes] = useState([]);
+  const [quizAttempts, setQuizAttempts] = useState<any[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
+  const [quizzes, setQuizzes] = useState<any[]>([]);
   const [editingQuiz, setEditingQuiz] = useState<any>(null);
   const [quizForm, setQuizForm] = useState({ title: '', questions: [] as any[] });
   const [formConfig, setFormConfig] = useState<any>(null);
