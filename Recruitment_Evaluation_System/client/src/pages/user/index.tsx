@@ -6,9 +6,9 @@ import { storage } from '../../utils/storage';
 export default function UserDashboard() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('virtual-run');
-  const [runs, setRuns] = useState([]);
-  const [quizzes, setQuizzes] = useState([]);
-  const [attempts, setAttempts] = useState([]);
+  const [runs, setRuns] = useState<any[]>([]);
+  const [quizzes, setQuizzes] = useState<any[]>([]);
+  const [attempts, setAttempts] = useState<any[]>([]);
   const [formUrl, setFormUrl] = useState('');
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [submittedAt, setSubmittedAt] = useState<string | null>(null);
