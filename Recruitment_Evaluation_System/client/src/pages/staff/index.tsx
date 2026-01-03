@@ -28,7 +28,7 @@ export default function StaffDashboard() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('virtual-runs');
   const [virtualRuns, setVirtualRuns] = useState([]);
-  const [formSubmissions, setFormSubmissions] = useState([]);
+  const [formSubmissions, setFormSubmissions] = useState<any[]>([]);
   const [allFormSubmissions, setAllFormSubmissions] = useState<any[]>([]);
   const [activeFormTab, setActiveFormTab] = useState<string | null>(null);
   const [previewFormUrl, setPreviewFormUrl] = useState<string | null>(null);
