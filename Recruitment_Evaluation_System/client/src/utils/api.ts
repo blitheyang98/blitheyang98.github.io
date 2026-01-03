@@ -3,26 +3,36 @@ import { storage } from './storage';
 
 // Use environment variable or detect localhost for development
 const getApiUrl = () => {
-  // Priority: NEXT_PUBLIC_API_URL (for production/GitHub Pages)
-  // This is set at build time via GitHub Secrets
+  // Priority 1: Runtime window variable (set in _app.tsx)
   if (typeof window !== 'undefined' && (window as any).__NEXT_PUBLIC_API_URL__) {
-    return (window as any).__NEXT_PUBLIC_API_URL__;
+    const url = (window as any).__NEXT_PUBLIC_API_URL__;
+    console.log('Using API URL from window:', url);
+    return url;
   }
   
+  // Priority 2: Build-time environment variable (for GitHub Pages)
   if (process.env.NEXT_PUBLIC_API_URL) {
+    console.log('Using API URL from env:', process.env.NEXT_PUBLIC_API_URL);
     return process.env.NEXT_PUBLIC_API_URL;
   }
   
-  // For local development, detect localhost
+  // Priority 3: For local development, detect localhost
   if (typeof window !== 'undefined') {
     const origin = window.location.origin;
     if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      console.log('Using localhost API URL for development');
       return 'http://localhost:5001/api';
+    }
+    
+    // If on GitHub Pages but no API URL set, show error
+    if (origin.includes('github.io')) {
+      console.error('NEXT_PUBLIC_API_URL not set! Please configure GitHub Secrets and redeploy.');
+      alert('API URL not configured. Please check GitHub Secrets and redeploy.');
     }
   }
   
-  // Fallback - but this won't work on GitHub Pages
-  console.warn('NEXT_PUBLIC_API_URL not set, using localhost fallback (may not work on GitHub Pages)');
+  // Fallback
+  console.warn('NEXT_PUBLIC_API_URL not set, using localhost fallback');
   return 'http://localhost:5001/api';
 };
 
