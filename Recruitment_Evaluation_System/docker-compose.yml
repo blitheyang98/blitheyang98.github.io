@@ -77,17 +77,25 @@ services:
     depends_on:
       - backend
 
-  tunnelmole:
-    image: node:18-alpine
-    command: sh -c "npm install -g tunnelmole && tunnelmole 5001"
-    network_mode: "host"
-    depends_on:
-      - backend
-    restart: unless-stopped
-    profiles:
-      - tunnelmole
-    # Note: network_mode: "host" allows the container to access localhost:5000
-    # where the backend service is exposed
+  # tunnelmole-proxy: DEPRECATED - No longer needed
+  # Tunnelmole now connects directly to backend on port 5001
+  # If you need to use proxy for some reason, uncomment below:
+  #
+  # tunnelmole-proxy:
+  #   image: nginx:alpine
+  #   ports:
+  #     - "5002:80"
+  #   volumes:
+  #     - ./tunnelmole-nginx.conf:/etc/nginx/conf.d/default.conf:ro
+  #   depends_on:
+  #     - backend
+  #   restart: unless-stopped
+  #   profiles:
+  #     - tunnelmole
+
+  # Note: Tunnelmole should be run on the host machine, not in Docker
+  # Run on host: npx -y tunnelmole 5001 (direct connection to backend)
+  # Or use: ./start-tunnelmole.sh
 
 volumes:
   postgres_data:

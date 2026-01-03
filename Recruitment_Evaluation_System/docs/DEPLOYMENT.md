@@ -33,8 +33,12 @@ docker-compose up -d postgres backend
 # 等待服务就绪
 sleep 15
 
-# 启动 Tunnelmole（将本地后端暴露到公网）
-docker-compose --profile tunnelmole up -d tunnelmole
+# 启动 Tunnelmole（在主机上运行，将本地后端暴露到公网）
+# 方法 1: 使用启动脚本（推荐）
+./start-tunnelmole.sh
+
+# 方法 2: 手动运行
+npx -y tunnelmole 5001
 ```
 
 或者使用启动脚本(该脚本会同时启动localhost frontend)：
@@ -45,22 +49,17 @@ docker-compose --profile tunnelmole up -d tunnelmole
 
 ### 1.2 获取 Tunnelmole URL
 
-Tunnelmole 启动后，会生成一个公网 URL。获取方法：
-
-```bash
-# 方法 1: 查看日志
-docker-compose logs tunnelmole | grep 'https://'
-
-# 方法 2: 实时查看日志
-docker-compose logs -f tunnelmole
+Tunnelmole 启动后，会在终端显示公网 URL。你会看到类似这样的输出：
+```
+https://xxxxx-ip-xxx-xxx-xxx-xxx.tunnelmole.net ⟶   http://localhost:5001
+http://xxxxx-ip-xxx-xxx-xxx-xxx.tunnelmole.net ⟶   http://localhost:5001
 ```
 
-你会看到类似这样的输出：
-```
-https://xxxxx-ip-xxx-xxx-xxx-xxx.tunnelmole.net
-```
-
-**重要**: 复制完整的 HTTPS URL（例如：`https://xxxxx.tunnelmole.net`）
+**重要**: 
+- 复制完整的 HTTPS URL（例如：`https://xxxxx.tunnelmole.net`）
+- Tunnelmole 直接连接到后端端口 5001（无需 proxy）
+- Tunnelmole 需要在主机上持续运行，不要关闭终端窗口
+- 如果需要后台运行，可以使用：`nohup npx -y tunnelmole 5001 > tunnelmole.log 2>&1 &`
 
 ### 1.3 验证后端可访问
 
@@ -84,9 +83,10 @@ curl https://xxxxx.tunnelmole.net/api/health
 - 如果 Tunnelmole 连接超时，可能是网络问题，但本地后端正常即可继续
 - 如果返回 404，检查后端是否已重启以加载新的 health 端点
 - 如果连接错误，检查：
-  - Tunnelmole 容器是否运行：`docker-compose ps`
+  - Tunnelmole 进程是否运行：`ps aux | grep tunnelmole`
   - 后端容器是否运行：`docker-compose ps backend`
   - 查看后端日志：`docker-compose logs backend`
+  - 测试后端直接连接：`curl http://localhost:5001/api/health`
 
 ## 步骤 2: 配置 GitHub Pages
 
@@ -362,8 +362,9 @@ GitHub Actions 会自动：
 
 ### 3.1 获取新 URL
 
+如果 Tunnelmole 正在运行，查看终端输出。或者重新启动 Tunnelmole：
 ```bash
-docker-compose logs tunnelmole | grep 'https://'
+npx -y tunnelmole 5001
 ```
 
 ### 3.2 更新 GitHub Secrets
@@ -427,8 +428,10 @@ git push
 ### 3. 前端无法连接后端
 
 检查：
-- Tunnelmole 容器是否运行：`docker-compose ps`
-- Tunnelmole URL 是否正确：`docker-compose logs tunnelmole`
+- Tunnelmole 进程是否运行：`ps aux | grep tunnelmole`
+- 后端容器是否运行：`docker-compose ps backend`
+- 测试后端直接连接：`curl http://localhost:5001/api/health`
+- Tunnelmole URL 是否正确（查看运行 Tunnelmole 的终端输出）
 - GitHub Secrets 中的 URL 是否正确（包含 `/api` 后缀）
 
 ### 4. 图片无法显示
@@ -454,15 +457,18 @@ docker-compose logs -f tunnelmole
 # 停止所有服务
 docker-compose down
 
-# 只停止 Tunnelmole
-docker-compose --profile tunnelmole stop tunnelmole
+# 停止 Tunnelmole（在运行 Tunnelmole 的终端按 Ctrl+C）
+# 或者查找并终止进程：
+pkill -f tunnelmole
 ```
 
 ### 重启服务
 
 ```bash
 docker-compose restart backend
-docker-compose restart tunnelmole
+# 重启 Tunnelmole（先停止，然后重新运行）
+pkill -f tunnelmole
+npx -y tunnelmole 5001
 ```
 
 ## 安全注意事项

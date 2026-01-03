@@ -8,43 +8,20 @@ docker-compose up --build -d
 echo "Waiting for services to be ready..."
 sleep 15
 
-# Start Tunnelmole for Google Form sync
+# Start Tunnelmole on host machine (for GitHub Pages deployment)
 echo ""
-echo "Starting Tunnelmole for Google Form sync..."
-docker-compose --profile tunnelmole up -d tunnelmole
-
-echo "Waiting for Tunnelmole to start..."
-sleep 3
-
-# Extract and save Tunnelmole URL to file for backend to read
-# Try multiple times as Tunnelmole may need a moment to generate the URL
+echo "Starting Tunnelmole on host machine..."
+echo "   Note: Tunnelmole needs to run on the host (not in Docker)"
+echo "   Tunnelmole will connect directly to backend on port 5001"
+echo "   Run this command in a separate terminal:"
+echo "   ./start-tunnelmole.sh"
 echo ""
-echo "Extracting Tunnelmole URL..."
-TUNNELMOLE_URL=""
-for i in {1..5}; do
-  TUNNELMOLE_URL=$(docker-compose logs tunnelmole 2>/dev/null | grep -o "https://[^ ]*tunnelmole.net" | head -1)
-  if [ -n "$TUNNELMOLE_URL" ]; then
-    break
-  fi
-  if [ $i -lt 5 ]; then
-    echo "   Attempt $i: URL not found yet, waiting..."
-    sleep 2
-  fi
-done
-
-if [ -n "$TUNNELMOLE_URL" ]; then
-  # Save to both project root and server directory (server dir is mounted in container)
-  echo "$TUNNELMOLE_URL" > .tunnelmole-url
-  echo "$TUNNELMOLE_URL" > server/.tunnelmole-url
-  echo "✅ Tunnelmole URL saved: $TUNNELMOLE_URL"
-  echo "   The URL is now available in the Staff page under 'Google Form Config' tab"
-else
-  echo "⚠️  Warning: Could not extract Tunnelmole URL from logs after 5 attempts"
-  echo "   You may need to:"
-  echo "   1. Check Tunnelmole logs: docker-compose logs tunnelmole"
-  echo "   2. Manually extract URL: docker-compose logs tunnelmole | grep 'https://'"
-  echo "   3. Save it to server/.tunnelmole-url file"
-fi
+echo "   Or manually: npx -y tunnelmole 5001"
+echo ""
+echo "   After Tunnelmole starts, it will display a public URL."
+echo "   Copy the HTTPS URL and:"
+echo "   1. Save it to .tunnelmole-url file"
+echo "   2. Update GitHub Secrets (NEXT_PUBLIC_API_URL) for GitHub Pages deployment"
 
 echo ""
 echo "Services started!"
@@ -56,14 +33,19 @@ echo "Test accounts:"
 echo "Staff: staff@test.com / password123"
 echo "User: user@test.com / password123"
 echo ""
-echo "Tunnelmole URL (for Google Form sync):"
-echo "  Run: docker-compose logs tunnelmole | grep 'https://'"
-echo "  Or: docker-compose logs -f tunnelmole"
+echo "Tunnelmole (for Google Form sync and GitHub Pages):"
+echo "  Start Tunnelmole: ./start-tunnelmole.sh"
+echo "  Or manually: npx -y tunnelmole 5001"
 echo ""
+echo "  After starting, Tunnelmole will display a public URL."
 echo "  Look for the HTTPS URL (e.g., https://xxxxx.tunnelmole.net)"
 echo "  Use the HTTPS URL (not HTTP) for better security"
 echo ""
+echo "  To save URL to file:"
+echo "    echo 'https://xxxxx.tunnelmole.net' > .tunnelmole-url"
+echo "    echo 'https://xxxxx.tunnelmole.net' > server/.tunnelmole-url"
+echo ""
 echo "To view logs: docker-compose logs -f"
 echo "To stop: docker-compose down"
-echo "To stop Tunnelmole only: docker-compose --profile tunnelmole stop tunnelmole"
+echo "To stop Tunnelmole: pkill -f tunnelmole"
 

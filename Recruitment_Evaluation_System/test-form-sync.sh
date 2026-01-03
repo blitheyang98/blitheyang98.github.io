@@ -55,8 +55,8 @@ else
     echo "Troubleshooting:"
     echo "1. Make sure the backend is running: docker-compose ps"
     echo "2. Check backend logs: docker-compose logs backend"
-    echo "3. If using Tunnelmole, verify it's running: docker-compose ps tunnelmole"
-    echo "4. Check Tunnelmole logs: docker-compose logs tunnelmole"
-    echo "5. Verify URL is correct"
+    echo "3. If using Tunnelmole, verify it's running: ps aux | grep tunnelmole"
+    echo "4. Test backend locally: curl http://localhost:5001/api/health"
+    echo "5. Verify URL is correct (should start with https://)"
 fi
 
