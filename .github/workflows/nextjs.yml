@@ -53,7 +53,7 @@ jobs:
       - name: Install SWC for Linux
         working-directory: ./Recruitment_Evaluation_System/client
         run: |
-          npm install @next/swc-linux-x64-gnu@14.2.35 --save-optional --force || npm install @next/swc-linux-x64-gnu --save-optional --force
+          npm install @next/swc-linux-x64-gnu@latest --save-optional --force || true
       - name: Build with Next.js
         working-directory: ./Recruitment_Evaluation_System/client
         env:
