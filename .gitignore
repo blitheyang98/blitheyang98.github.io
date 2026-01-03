@@ -1,0 +1,11 @@
+# Cursor IDE
+.cursor/
+
+# Backend (not needed for GitHub Pages)
+Recruitment_Evaluation_System/server/
+Recruitment_Evaluation_System/google-apps-script/
+
+# Other
+Recruitment_Evaluation_System_new.zip
+*.zip
+
