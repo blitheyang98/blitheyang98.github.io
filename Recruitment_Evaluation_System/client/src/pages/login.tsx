@@ -6,12 +6,21 @@ import { storage } from '../utils/storage';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isStaffPort, setIsStaffPort] = useState(false);
+  const [isStaffPortal, setIsStaffPortal] = useState(false);
   const router = useRouter();
   
-  // Check which port we're on (client-side only)
+  // Check which portal we're on (client-side only)
   useEffect(() => {
-    setIsStaffPort(window.location.port === '3001');
+    // For GitHub Pages, check query parameter
+    const searchParams = new URLSearchParams(window.location.search);
+    const portal = searchParams.get('portal');
+    
+    // For local development, check port
+    const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const isStaffPort = isLocalDev && window.location.port === '3001';
+    
+    // Staff portal if query param is 'staff' or port is 3001
+    setIsStaffPortal(portal === 'staff' || isStaffPort);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -28,13 +37,25 @@ export default function Login() {
 
   const handleLoginSuccess = (data: any) => {
     // Check if user is trying to access the wrong portal
-    if (isStaffPort && data.user.role !== 'staff' && data.user.role !== 'manager') {
-      alert('This is the staff portal. Please use the user portal at http://localhost:3000');
+    if (isStaffPortal && data.user.role !== 'staff' && data.user.role !== 'manager') {
+      const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      if (isLocalDev) {
+        alert('This is the staff portal. Please use the user portal at http://localhost:3000');
+      } else {
+        alert('This is the staff portal. Please use the user portal.');
+        router.push('/login');
+      }
       return;
     }
     
-    if (!isStaffPort && (data.user.role === 'staff' || data.user.role === 'manager')) {
-      alert('This is the user portal. Please use the staff portal at http://localhost:3001');
+    if (!isStaffPortal && (data.user.role === 'staff' || data.user.role === 'manager')) {
+      const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      if (isLocalDev) {
+        alert('This is the user portal. Please use the staff portal at http://localhost:3001');
+      } else {
+        alert('This is the user portal. Please use the staff portal.');
+        router.push('/login?portal=staff');
+      }
       return;
     }
     
@@ -51,14 +72,14 @@ export default function Login() {
 
   return (
     <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px' }}>
-      <h1>{isStaffPort ? 'Staff Login' : 'User Login / Sign Up'}</h1>
-      {isStaffPort ? (
+      <h1>{isStaffPortal ? 'Staff Login' : 'User Login / Sign Up'}</h1>
+      {isStaffPortal ? (
         <p style={{ color: '#666', marginBottom: '20px', fontSize: '14px' }}>
-          Staff Portal - Port 3001
+          Staff Portal
         </p>
       ) : (
         <p style={{ color: '#666', marginBottom: '20px', fontSize: '14px' }}>
-          User Portal - Port 3000<br />
+          User Portal<br />
           <span style={{ fontSize: '12px' }}>New users can sign up with email</span>
         </p>
       )}
@@ -88,7 +109,7 @@ export default function Login() {
         </button>
       </form>
       
-      {!isStaffPort && (
+      {!isStaffPortal && (
         <div style={{ textAlign: 'center', marginTop: '20px' }}>
           <p style={{ fontSize: '14px', color: '#666' }}>
             Don't have an account?{' '}
