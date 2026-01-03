@@ -49,11 +49,14 @@ jobs:
             ${{ runner.os }}-nextjs-${{ hashFiles('Recruitment_Evaluation_System/client/**/package-lock.json') }}-
       - name: Install dependencies
         working-directory: ./Recruitment_Evaluation_System/client
-        run: npm install
-      - name: Install SWC for Linux
+        run: npm install --include=optional
+      - name: Ensure SWC is available
         working-directory: ./Recruitment_Evaluation_System/client
         run: |
-          npm install @next/swc-linux-x64-gnu@latest --save-optional --force || true
+          if [ ! -d "node_modules/@next/swc-linux-x64-gnu" ]; then
+            echo "Installing SWC binary..."
+            npm install @next/swc-linux-x64-gnu --save-optional --no-save || true
+          fi
       - name: Build with Next.js
         working-directory: ./Recruitment_Evaluation_System/client
         env:
