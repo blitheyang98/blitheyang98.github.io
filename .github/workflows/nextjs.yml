@@ -55,6 +55,7 @@ jobs:
         env:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
           NEXT_PUBLIC_GOOGLE_FORM_URL: ${{ secrets.NEXT_PUBLIC_GOOGLE_FORM_URL }}
+          NEXT_DISABLE_SWC: 1
         run: npm run build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
