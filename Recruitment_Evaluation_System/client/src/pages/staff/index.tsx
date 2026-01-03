@@ -146,6 +146,17 @@ export default function StaffDashboard() {
       } else if (activeTab === 'users') {
         const { data } = await api.get('/staff/users');
         setUsers(data.data);
+        
+        // Update currentUser if their info is in the users list
+        if (currentUser) {
+          const updatedUserInfo = data.data.find((u: any) => u.id === currentUser.id);
+          if (updatedUserInfo && updatedUserInfo.role !== currentUser.role) {
+            const updatedUser = { ...currentUser, role: updatedUserInfo.role };
+            storage.setItem('user', JSON.stringify(updatedUser));
+            storage.setItem('role', updatedUserInfo.role);
+            setCurrentUser(updatedUser);
+          }
+        }
       } else if (activeTab === 'manage-quizzes') {
         const { data } = await api.get('/quiz/questions');
         setQuizzes(data.data);
@@ -3737,6 +3748,15 @@ export default function StaffDashboard() {
                             try {
                               await api.put(`/staff/users/${user.id}/role`, { role: newRole });
                               alert('Role updated successfully');
+                              
+                              // If the updated user is the current logged-in user, update their info
+                              if (currentUser && currentUser.id === user.id) {
+                                const updatedUser = { ...currentUser, role: newRole };
+                                storage.setItem('user', JSON.stringify(updatedUser));
+                                storage.setItem('role', newRole);
+                                setCurrentUser(updatedUser);
+                              }
+                              
                               loadData();
                             } catch (error: any) {
                               alert(error.response?.data?.error || 'Failed to update role');
